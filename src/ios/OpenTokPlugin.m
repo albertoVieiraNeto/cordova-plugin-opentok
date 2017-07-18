@@ -27,16 +27,13 @@
 	
 	self.webView.superview.backgroundColor = [UIColor whiteColor];
 	[self.webView.superview setOpaque:NO];
-    
-	self.webView.backgroundColor = [UIColor clearColor];
-    [self.webView setOpaque:NO];
-	
+
 }
+
 - (void)addEvent:(CDVInvokedUrlCommand*)command{
     NSString* event = [command.arguments objectAtIndex:0];
     [callbackList setObject:command.callbackId forKey: event];
 }
-
 
 #pragma mark -
 #pragma mark Cordova JS - iOS bindings
@@ -85,7 +82,8 @@
         int height = [[command.arguments objectAtIndex:4] intValue];
         int zIndex = [[command.arguments objectAtIndex:5] intValue];
         int borderRadius = [[command.arguments objectAtIndex:8] intValue];
-        
+        int zIndexParent = [[command.arguments objectAtIndex:9] intValue];
+    
         NSString* publishAudio = [command.arguments objectAtIndex:6];
         if ([publishAudio isEqualToString:@"false"]) {
             bpubAudio = NO;
@@ -105,14 +103,14 @@
 			
             //[self.webView.superview addSubview:_publisher.view];
 			[self.webView.superview insertSubview:_publisher.view atIndex:0];
-			self.webView.layer.zPosition = 999;
+			self.webView.layer.zPosition = zIndexParent;
 			
 			[_publisher.view setFrame:CGRectMake(left, top, width, height)];
-            _publisher.view.layer.zPosition = 1;
+            //_publisher.view.layer.zPosition = 1;
 			
-			//if (zIndex>0) {
-                //_publisher.view.layer.zPosition = zIndex;
-            //}
+			if (zIndex>0) {
+                _publisher.view.layer.zPosition = zIndex;
+            }
             
 			NSString* cameraPosition = [command.arguments objectAtIndex:8];
             if ([cameraPosition isEqualToString:@"back"]) {
@@ -325,6 +323,7 @@
     int height = [[command.arguments objectAtIndex:4] intValue];
     int zIndex = [[command.arguments objectAtIndex:5] intValue];
     int borderRadius = [[command.arguments objectAtIndex:8] intValue];
+    int zIndexParent = [[command.arguments objectAtIndex:9] intValue];
     
     // Acquire Stream, then create a subscriber object and put it into dictionary
     OTStream* myStream = [streamDictionary objectForKey:sid];
@@ -341,17 +340,20 @@
     [subscriberDictionary setObject:sub forKey:myStream.streamId];
     
     [sub.view setFrame:CGRectMake(left, top, width, height)];
-    //if (zIndex>0) {
-    //    sub.view.layer.zPosition = zIndex;
-    //}
+
+    
     sub.view.layer.cornerRadius = borderRadius;
     sub.view.clipsToBounds = borderRadius ? YES : NO;
 	
     //[self.webView.superview addSubview:sub.view];
 	[self.webView.superview insertSubview:sub.view atIndex:0];
 	
-	self.webView.layer.zPosition = 999;
+	self.webView.layer.zPosition = zIndexParent;
+    
 	sub.view.layer.zPosition = 1;
+    if (zIndex>0) {
+        sub.view.layer.zPosition = zIndex;
+    }
     
     if (error) {
         NSLog(@"Session.subscribe failed: %@", [error localizedDescription]);
@@ -397,10 +399,20 @@
 
 // Called by session.unsubscribe(streamId, top, left)
 - (void)signal:(CDVInvokedUrlCommand*)command{
+    
+    OTError* error = nil;
+    
     NSLog(@"iOS signaling to connectionId %@", [command.arguments objectAtIndex:2]);
+    
     OTConnection* c = [connectionDictionary objectForKey: [command.arguments objectAtIndex:2]];
     NSLog(@"iOS signaling to connection %@", c);
-    [_session signalWithType:[command.arguments objectAtIndex:0] string:[command.arguments objectAtIndex:1] connection:c error:nil];
+    
+    [_session signalWithType:[command.arguments objectAtIndex:0] string:[command.arguments objectAtIndex:1] connection:c error:&error];
+    
+    CDVPluginResult* pluginResult = error ?
+    [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[NSString stringWithFormat:@"%@ SIGNAL", [error localizedDescription]]] :
+    [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 
@@ -461,12 +473,7 @@
     
     
     NSLog(@"object for session is %@", sessionDict);
-    
-    // After session dictionary is constructed, return the result!
-    //    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:sessionDict];
-    //    NSString* sessionConnectCallback = [callbackList objectForKey:@"sessSessionConnected"];
-    //    [self.commandDelegate sendPluginResult:pluginResult callbackId:sessionConnectCallback];
-    
+       
     
     [self triggerJSEvent: @"sessionEvents" withType: @"sessionConnected" withData: eventData];
 }
@@ -638,4 +645,3 @@
 
 
 @end
-
