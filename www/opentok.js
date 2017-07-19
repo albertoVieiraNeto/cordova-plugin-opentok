@@ -175,24 +175,33 @@ getPosition = function (divName) {
     }
     computedStyle = window.getComputedStyle ? getComputedStyle(pubDiv, null) : {};
     transform = new WebKitCSSMatrix(window.getComputedStyle(pubDiv).transform || '');
+
     width = pubDiv.offsetWidth;
     height = pubDiv.offsetHeight;
     curtop = pubDiv.offsetTop + transform.m41;
     curleft = pubDiv.offsetLeft + transform.m42;
+
     while ((pubDiv = pubDiv.offsetParent)) {
         transform = new WebKitCSSMatrix(window.getComputedStyle(pubDiv).transform || '');
         curleft += pubDiv.offsetLeft + transform.m41;
         curtop += pubDiv.offsetTop + transform.m42;
     }
+
     marginTop = parseInt(computedStyle.marginTop) || 0;
     marginBottom = parseInt(computedStyle.marginBottom) || 0;
     marginLeft = parseInt(computedStyle.marginLeft) || 0;
     marginRight = parseInt(computedStyle.marginRight) || 0;
+    
+    if (cordova.platformId == 'ios') {
+        marginTop = marginTop + 15;
+    }
+
     return {
-        top: curtop + marginTop,
-        left: curleft + marginLeft,
-        width: width - (marginLeft + marginRight),
-        height: height - (marginTop + marginBottom)
+        //top: ((window.screen.height * window.devicePixelRatio) / 2) - (((window.screen.height * window.devicePixelRatio) * 0.7) / 2),  //curtop + marginTop
+        top: (curtop + marginTop) * window.devicePixelRatio, 
+        left: (curleft + marginLeft) * window.devicePixelRatio,
+        width: width - (marginLeft + marginRight) * window.devicePixelRatio,
+        height: height - (marginTop + marginBottom) * window.devicePixelRatio
     };
 };
 
@@ -324,17 +333,20 @@ TBPublisher = (function () {
         zIndex = TBGetZIndex(this.element);
         ratios = TBGetScreenRatios();
         borderRadius = TBGetBorderRadius(this.element);
-        if (this.properties != null) {
-            width = (_ref = this.properties.width) != null ? _ref : position.width;
-            height = (_ref1 = this.properties.height) != null ? _ref1 : position.height;
-            name = (_ref2 = this.properties.name) != null ? _ref2 : "";
-            cameraName = (_ref3 = this.properties.cameraName) != null ? _ref3 : "front";
-            zIndexParent = (typeof this.properties.zIndexParent == 'undefined') ? 999 : this.properties.zIndexParent;
 
-            if ((this.properties.publishAudio != null) && this.properties.publishAudio === false) {
+        if (properties != null) {
+            width = (_ref = properties.width) != null ? _ref : position.width;
+            height = (_ref1 = properties.height) != null ? _ref1 : position.height;
+            name = (_ref2 = properties.name) != null ? _ref2 : "";
+            cameraName = (_ref3 = properties.cameraName) != null ? _ref3 : "front";
+            zIndexParent = (typeof properties.zIndexParent == 'undefined') ? 999 : properties.zIndexParent;
+            position.top = (typeof properties.top != 'undefined') ? properties.top : position.top;
+            position.left = (typeof properties.left != 'undefined') ? properties.left : position.left;
+
+            if ((properties.publishAudio != null) && properties.publishAudio === false) {
                 publishAudio = "false";
             }
-            if ((this.properties.publishVideo != null) && this.properties.publishVideo === false) {
+            if ((properties.publishVideo != null) && properties.publishVideo === false) {
                 publishVideo = "false";
             }
         }
@@ -346,8 +358,8 @@ TBPublisher = (function () {
             width: width,
             height: height
         });
-        position = getPosition(obj.id);
-        TBUpdateObjects();
+
+        TB.updateViews();
         OT.getHelper().eventing(this);
         onSuccess = function (result) {
             if (completionHandler != null) {
@@ -361,6 +373,9 @@ TBPublisher = (function () {
             }
             return TBError(result);
         };
+
+        console.log('parametros');
+        console.log([name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo, cameraName, ratios.widthRatio, ratios.heightRatio, borderRadius]);
         Cordova.exec(onSuccess, onError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo, cameraName, ratios.widthRatio, ratios.heightRatio, borderRadius]);
         Cordova.exec(this.eventReceived, TBSuccess, OTPlugin, "addEvent", ["publisherEvents"]);
     }
@@ -910,6 +925,9 @@ TBSubscriber = (function () {
         ratios = TBGetScreenRatios();
         borderRadius = TBGetBorderRadius(element);
         pdebug("final subscriber position", position);
+
+        console.log('posição do plubisher');
+        console.log([stream.streamId, position.top, position.left, width, height, zIndex, subscribeToAudio, subscribeToVideo, ratios.widthRatio, ratios.heightRatio, borderRadius])
         Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToAudio, subscribeToVideo, ratios.widthRatio, ratios.heightRatio, borderRadius]);
     }
 
@@ -938,6 +956,7 @@ StringSplitter = "$2#9$";
 DefaultWidth = 264;
 
 DefaultHeight = 198;
+
 ;/**
  * @license  Common JS Helpers on OpenTok 0.2.0 1f056b9 master
  * http://www.tokbox.com/
