@@ -196,23 +196,17 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
           Log.i(TAG, "error when trying to retrieve publish audio/video property");
         }
         this.mView = mPublisher.getView();
-        frame.addView( this.mView );
+        frame.addView( this.mView );   
 		
-		JSONObject parameter = new JSONObject();
-       
-		
-		try{
-			parameter.put("error", null);
-			PluginResult result = new PluginResult(PluginResult.Status.OK, parameter);
+		try{			
+			PluginResult result = new PluginResult(PluginResult.Status.OK, null);
             this.callbackContext.sendPluginResult(result);
 			mSession.publish(mPublisher);
 		}catch(JSONException e){
-			parameter.put("error", "erro ao publicar stream");
-			PluginResult result = new PluginResult(PluginResult.Status.OK, parameter);
+			PluginResult result = new PluginResult(PluginResult.Status.OK, "erro ao publicar stream");
             this.callbackContext.sendPluginResult(result);
 		}catch(Exception e){
-			parameter.put("error", "erro ao publicar stream");
-			PluginResult result = new PluginResult(PluginResult.Status.OK, parameter);
+			PluginResult result = new PluginResult(PluginResult.Status.OK, "erro ao publicar stream");
             this.callbackContext.sendPluginResult(result);
 		}
         
