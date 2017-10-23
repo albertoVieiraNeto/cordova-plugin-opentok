@@ -392,7 +392,11 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
       Log.i( TAG, action );
       // TB Methods
       if( action.equals("initPublisher")){
+		  
         myPublisher = new RunnablePublisher( args );
+		callbackContext.success();
+         return true;
+		 
       }else if( action.equals( "destroyPublisher" )){
       if( myPublisher != null ){
          cordova.getActivity().runOnUiThread(new Runnable() {

@@ -191,13 +191,12 @@ getPosition = function (divName) {
     marginBottom = parseInt(computedStyle.marginBottom) || 0;
     marginLeft = parseInt(computedStyle.marginLeft) || 0;
     marginRight = parseInt(computedStyle.marginRight) || 0;
-    
+
     if (cordova.platformId == 'ios') {
         marginTop = marginTop + 15;
     }
 
     return {
-        //top: ((window.screen.height * window.devicePixelRatio) / 2) - (((window.screen.height * window.devicePixelRatio) * 0.7) / 2),  //curtop + marginTop
         top: (curtop + marginTop) * window.devicePixelRatio, 
         left: (curleft + marginLeft) * window.devicePixelRatio,
         width: width - (marginLeft + marginRight) * window.devicePixelRatio,
