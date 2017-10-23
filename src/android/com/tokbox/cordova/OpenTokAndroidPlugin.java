@@ -136,8 +136,10 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
   public class RunnablePublisher extends RunnableUpdateViews implements 
     PublisherKit.PublisherListener, Publisher.CameraListener{
     //  property contains: [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo, cameraName] )
+	
     public Publisher mPublisher;
-
+	public CallbackContext callbackContext;
+	
     public RunnablePublisher( JSONArray args ){
       this.mProperty = args;
 
@@ -154,8 +156,9 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
       this.mProperty = args;
     }
 
-    public void startPublishing(){
-      cordova.getActivity().runOnUiThread( this );
+    public void startPublishing(CallbackContext callbackContext){
+	  this.callbackContext = callbackContext;
+      cordova.getActivity().runOnUiThread( this );	  
     }
 
 
@@ -195,8 +198,22 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
         this.mView = mPublisher.getView();
         frame.addView( this.mView );
 		
+		JSONObject parameter = new JSONObject();
+       
 		
-        mSession.publish(mPublisher);
+		try{
+			parameter.put("error", null);
+			PluginResult result = new PluginResult(PluginResult.Status.OK, parameter);
+            result.setKeepCallback(true);
+            callbackContext.sendPluginResult(result);
+			mSession.publish(mPublisher);
+		}catch(Exception e){
+			parameter.put("error", "erro ao publicar stream");
+			PluginResult result = new PluginResult(PluginResult.Status.OK, parameter);
+            result.setKeepCallback(true);
+            callbackContext.sendPluginResult(result);
+		}
+        
       }
       super.run();
     }
@@ -392,11 +409,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
       Log.i( TAG, action );
       // TB Methods
       if( action.equals("initPublisher")){
-		  
         myPublisher = new RunnablePublisher( args );
-		callbackContext.success();
-         return true;
-		 
       }else if( action.equals( "destroyPublisher" )){
       if( myPublisher != null ){
          cordova.getActivity().runOnUiThread(new Runnable() {
@@ -455,7 +468,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
       }else if( action.equals( "publish" )){
         if( sessionConnected ){
           Log.i( TAG, "publisher is publishing" );
-          myPublisher.startPublishing();
+          myPublisher.startPublishing(callbackContext);
         }
       }else if( action.equals( "signal" )){
         Connection c = connectionCollection.get(args.getString(2));
