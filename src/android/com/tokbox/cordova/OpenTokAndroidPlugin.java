@@ -198,17 +198,13 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
         this.mView = mPublisher.getView();
         frame.addView( this.mView ); 
 
-		PluginResult result = null;
 		
-		try{
-			mSession.publish(mPublisher);
-			result = new PluginResult(PluginResult.Status.OK, "");
-		}catch(Exception e){
-			result = new PluginResult(PluginResult.Status.Error, "erro ao publicar stream");
-		}
-		
+		mSession.publish(mPublisher);
+		PluginResult result = new PluginResult(PluginResult.Status.OK, "");
 		result.setKeepCallback(true);
-        this.callbackContext.sendPluginResult(result);
+        callbackContext.sendPluginResult(result);
+
+
 
       }
 	  
