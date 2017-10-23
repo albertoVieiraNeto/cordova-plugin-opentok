@@ -206,6 +206,10 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
 			PluginResult result = new PluginResult(PluginResult.Status.OK, parameter);
             this.callbackContext.sendPluginResult(result);
 			mSession.publish(mPublisher);
+		}catch(JSONException e){
+			parameter.put("error", "erro ao publicar stream");
+			PluginResult result = new PluginResult(PluginResult.Status.OK, parameter);
+            this.callbackContext.sendPluginResult(result);
 		}catch(Exception e){
 			parameter.put("error", "erro ao publicar stream");
 			PluginResult result = new PluginResult(PluginResult.Status.OK, parameter);
