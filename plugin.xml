@@ -11,6 +11,9 @@
 
     <platform name="android">
       <framework src="build-extras.gradle" custom="true" type="gradleReference" />
+      <framework src="com.android.support:appcompat-v7:23.1.0" />
+      <framework src="com.android.support:design:23.0.0" />
+      <framework src="com.android.volley:volley:1.1.0" />
       <asset src="www/opentok.js" target="opentok.js" />
 
       <source-file src="src/android/com/tokbox/cordova/OpenTokAndroidPlugin.java"
@@ -31,11 +34,12 @@
       <source-file src="src/android/libs/armeabi/libopentok.so" target-dir="libs/armeabi" />
       <source-file src="src/android/libs/armeabi/libopentok.so" target-dir="libs/armeabi-v7a" />
       <source-file src="src/android/libs/x86/libopentok.so" target-dir="libs/x86" /> -->
-      <source-file src="src/android/libs/opentok-android-sdk-2.9.0.aar" target-dir="libs/" />
-
+      <!-- <source-file src="src/android/libs/opentok-android-sdk-2.9.0.aar" target-dir="libs/" /> -->
+      
       <config-file target="config.xml" parent="/*">
         <feature name="OpenTokPlugin">
           <param name="android-package" value="com.tokbox.cordova.OpenTokAndroidPlugin"/>
+      <param name="onload" value="true" />
         </feature>
       </config-file>
       
