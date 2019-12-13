@@ -77,7 +77,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin
     static CordovaInterface _cordova;
     static CordovaWebView _webView;
     public static final String[] perms = {Manifest.permission.INTERNET, Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
-    public CallbackContext permissionsCallback;
+    public final CallbackContext permissionsCallback;
 
 
     public class RunnableUpdateViews implements Runnable {
@@ -266,7 +266,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin
             }
         }
 
-        public void getImgData(CallbackContext callbackContext) {
+        public void getImgData(final CallbackContext callbackContext) {
             ((OpenTokCustomVideoRenderer) mPublisher.getRenderer()).getSnapshot(callbackContext);
         }
 
@@ -398,7 +398,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin
             super.run();
         }
 
-        public void getImgData(CallbackContext callbackContext) {
+        public void getImgData(final CallbackContext callbackContext) {
             ((OpenTokCustomVideoRenderer) mSubscriber.getRenderer()).getSnapshot(callbackContext);
         }
 
