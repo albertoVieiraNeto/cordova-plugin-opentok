@@ -634,7 +634,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin
             RunnableSubscriber runsub = new RunnableSubscriber(args, stream);
             subscriberCollection.put(stream.getStreamId(), runsub);
         } else if (action.equals("subscribeToAudio")) {
-            RunnableSubscriber runsub = subscriberCollection.get(args.getString(0));
+            final RunnableSubscriber runsub = subscriberCollection.get(args.getString(0));
             String val = args.getString(1);
             if(runsub != null) {
                 boolean subscribeAudio = true;
@@ -645,7 +645,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin
                 runsub.subscribeToAudio(subscribeAudio);
             }
         } else if (action.equals("subscribeToVideo")) {
-            RunnableSubscriber runsub = subscriberCollection.get(args.getString(0));
+            final RunnableSubscriber runsub = subscriberCollection.get(args.getString(0));
             String val = args.getString(1);
             if(runsub != null) {
                 boolean subscribeVideo = true;
@@ -661,7 +661,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin
                 myPublisher.setPropertyFromArray(args);
                 cordova.getActivity().runOnUiThread(myPublisher);
             } else {
-                RunnableSubscriber runsub = subscriberCollection.get(args.getString(0));
+                final RunnableSubscriber runsub = subscriberCollection.get(args.getString(0));
                 if (runsub != null) {
                     runsub.setPropertyFromArray(args);
                     cordova.getActivity().runOnUiThread(runsub);
@@ -676,7 +676,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin
                 });
                 return true;
             } else {
-                RunnableSubscriber runsub = subscriberCollection.get(args.getString(0));
+                final RunnableSubscriber runsub = subscriberCollection.get(args.getString(0));
                 if (runsub != null) {
                   cordova.getThreadPool().execute(new Runnable() {
                       public void run() {
