@@ -77,7 +77,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin
     static CordovaInterface _cordova;
     static CordovaWebView _webView;
     public static final String[] perms = {Manifest.permission.INTERNET, Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
-    public final CallbackContext permissionsCallback;
+    public CallbackContext permissionsCallback;
 
 
     public class RunnableUpdateViews implements Runnable {
